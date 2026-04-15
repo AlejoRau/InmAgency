@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentTool — InmoAgency</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">AgentTool <span class="logo-sub">by InmoAgency</span></span>
+      </div>
+      <p class="header-tagline">Generá contenido profesional para tus propiedades en segundos</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <form id="propertyForm" action="/generate" method="post" enctype="multipart/form-data">
+
+      <!-- SECCIÓN 1: Datos de la propiedad -->
+      <section class="form-section">
+        <h2 class="section-title">
+          <span class="section-number">1</span>
+          Datos de la propiedad
+        </h2>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="tipo">Tipo de propiedad <span class="required">*</span></label>
+            <select id="tipo" name="tipo" required>
+              <option value="" disabled selected>Seleccioná...</option>
+              <option value="Casa">Casa</option>
+              <option value="Departamento">Departamento</option>
+              <option value="Terreno">Terreno</option>
+              <option value="Penthouse">Penthouse</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="operacion">Operación <span class="required">*</span></label>
+            <select id="operacion" name="operacion" required>
+              <option value="" disabled selected>Seleccioná...</option>
+              <option value="Venta">Venta</option>
+              <option value="Alquiler">Alquiler</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="direccion">Dirección / Ubicación <span class="required">*</span></label>
+          <input type="text" id="direccion" name="direccion" required
+            placeholder="Ej: Av. Santa Fe 1234, Palermo" />
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="ciudad">Ciudad <span class="required">*</span></label>
+            <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Buenos Aires" />
+          </div>
+          <div class="form-group">
+            <label for="provincia">Provincia <span class="required">*</span></label>
+            <input type="text" id="provincia" name="provincia" required placeholder="Ej: CABA" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="precio">Precio en USD <span class="required">*</span></label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">USD</span>
+            <input type="text" id="precio" name="precio" required placeholder="Ej: 180,000" />
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2: Características -->
+      <section class="form-section">
+        <h2 class="section-title">
+          <span class="section-number">2</span>
+          Características
+        </h2>
+
+        <div class="form-row three-col">
+          <div class="form-group">
+            <label for="recamaras">Recámaras</label>
+            <input type="number" id="recamaras" name="recamaras" min="0" max="20" value="0" placeholder="0" />
+          </div>
+          <div class="form-group">
+            <label for="banos">Baños <span class="required">*</span></label>
+            <input type="number" id="banos" name="banos" min="0" max="20" required placeholder="0" />
+          </div>
+          <div class="form-group">
+            <label for="estacionamientos">Estacionamientos</label>
+            <input type="number" id="estacionamientos" name="estacionamientos" min="0" max="20" value="0" placeholder="0" />
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="m2_construidos">M² construidos <span class="required">*</span></label>
+            <div class="input-suffix-wrap">
+              <input type="number" id="m2_construidos" name="m2_construidos" min="0" required placeholder="0" />
+              <span class="input-suffix">m²</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="m2_terreno">M² de terreno</label>
+            <div class="input-suffix-wrap">
+              <input type="number" id="m2_terreno" name="m2_terreno" min="0" value="0" placeholder="0" />
+              <span class="input-suffix">m²</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3: Amenidades -->
+      <section class="form-section">
+        <h2 class="section-title">
+          <span class="section-number">3</span>
+          Amenidades
+        </h2>
+        <div class="amenidades-grid">
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Alberca/Pileta" />
+            <span class="checkbox-label">🏊 Alberca / Pileta</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Jardín" />
+            <span class="checkbox-label">🌳 Jardín</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Seguridad 24 horas" />
+            <span class="checkbox-label">🔒 Seguridad 24h</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Gimnasio" />
+            <span class="checkbox-label">💪 Gimnasio</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Parrilla/BBQ" />
+            <span class="checkbox-label">🔥 Parrilla / BBQ</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Laundry" />
+            <span class="checkbox-label">👕 Laundry</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Área de juegos infantiles" />
+            <span class="checkbox-label">🎠 Área de juegos</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Vista panorámica" />
+            <span class="checkbox-label">🌆 Vista panorámica</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Calefacción central" />
+            <span class="checkbox-label">🌡️ Calefacción central</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Aire acondicionado" />
+            <span class="checkbox-label">❄️ Aire acondicionado</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Terraza" />
+            <span class="checkbox-label">🏙️ Terraza</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="amenidades" value="Quincho" />
+            <span class="checkbox-label">🏡 Quincho</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 4: Descripción del agente -->
+      <section class="form-section">
+        <h2 class="section-title">
+          <span class="section-number">4</span>
+          Notas del agente sobre la propiedad
+        </h2>
+        <div class="form-group">
+          <label for="descripcion_agente">
+            ¿Qué destacás de esta propiedad? <span class="required">*</span>
+            <span class="label-hint">2-3 líneas de los puntos más fuertes que querés que la IA resalte</span>
+          </label>
+          <textarea id="descripcion_agente" name="descripcion_agente" required rows="4"
+            placeholder="Ej: Excelente luminosidad en todos los ambientes. Ubicación privilegiada a 2 cuadras del subte. Remodelación total en 2023 con materiales de primera calidad."></textarea>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 5: Fotos -->
+      <section class="form-section">
+        <h2 class="section-title">
+          <span class="section-number">5</span>
+          Fotos de la propiedad
+        </h2>
+        <div class="form-group">
+          <label for="fotos">
+            Subí las fotos <span class="required">*</span>
+            <span class="label-hint">La primera foto será la portada. Mínimo 1 requerida.</span>
+          </label>
+          <div class="file-upload-area" id="fileUploadArea">
+            <input type="file" id="fotos" name="fotos" multiple accept="image/*" required
+              class="file-input" />
+            <div class="file-upload-placeholder">
+              <span class="upload-icon">📷</span>
+              <span class="upload-text">Hacé clic o arrastrá las fotos aquí</span>
+              <span class="upload-hint">JPG, PNG, WEBP — La primera es la portada</span>
+            </div>
+          </div>
+          <div id="photoPreview" class="photo-preview"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 6: Datos del agente -->
+      <section class="form-section">
+        <h2 class="section-title">
+          <span class="section-number">6</span>
+          Datos del agente
+        </h2>
+
+        <div class="form-group">
+          <label for="nombre_agente">Nombre completo <span class="required">*</span></label>
+          <input type="text" id="nombre_agente" name="nombre_agente" required
+            placeholder="Ej: María González" />
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="telefono_agente">Teléfono / WhatsApp <span class="required">*</span></label>
+            <input type="tel" id="telefono_agente" name="telefono_agente" required
+              placeholder="Ej: +54 11 1234-5678" />
+          </div>
+          <div class="form-group">
+            <label for="email_agente">Email <span class="required">*</span></label>
+            <input type="email" id="email_agente" name="email_agente" required
+              placeholder="agente@inmoagency.com" />
+          </div>
+        </div>
+      </section>
+
+      <!-- SUBMIT -->
+      <div class="form-submit">
+        <button type="submit" class="btn-generate" id="submitBtn">
+          <span class="btn-text">✨ Generar contenido con IA</span>
+          <span class="btn-loading" style="display:none;">
+            <span class="spinner"></span> Generando...
+          </span>
+        </button>
+        <p class="submit-hint">El proceso tarda entre 10 y 20 segundos</p>
+      </div>
+
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <p>AgentTool &copy; 2026 — InmoAgency</p>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultado — AgentTool</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🏠</span>
+        <span class="logo-text">AgentTool <span class="logo-sub">by InmoAgency</span></span>
+      </div>
+      <p class="header-tagline">Contenido generado y listo para publicar</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    {% if error %}
+    <div class="error-banner">
+      <strong>Error al generar contenido:</strong> {{ error }}
+      <br><a href="/" class="error-link">← Volver al formulario</a>
+    </div>
+    {% else %}
+
+    <!-- RESUMEN DE LA PROPIEDAD -->
+    <section class="result-header">
+      {% if cover_photo %}
+      <div class="cover-photo-wrap">
+        <img src="{{ cover_photo }}" alt="Foto de portada" class="cover-photo" />
+        <div class="cover-badge">{{ operacion }} · {{ tipo }}</div>
+      </div>
+      {% endif %}
+
+      <div class="property-summary-card">
+        <h1 class="property-title">{{ tipo }} en {{ operacion }}</h1>
+        <p class="property-location">📍 {{ direccion }}, {{ ciudad }}, {{ provincia }}</p>
+        <p class="property-price">USD {{ precio }}</p>
+
+        <div class="property-specs">
+          {% if recamaras and recamaras != '0' %}
+          <span class="spec-item">🛏 {{ recamaras }} rec.</span>
+          {% endif %}
+          <span class="spec-item">🚿 {{ banos }} baños</span>
+          <span class="spec-item">📐 {{ m2_construidos }} m²</span>
+          {% if m2_terreno and m2_terreno != '0' %}
+          <span class="spec-item">🌿 {{ m2_terreno }} m² terreno</span>
+          {% endif %}
+          {% if estacionamientos and estacionamientos != '0' %}
+          <span class="spec-item">🚗 {{ estacionamientos }} estac.</span>
+          {% endif %}
+        </div>
+
+        {% if amenidades %}
+        <div class="property-amenidades">
+          {% for a in amenidades %}
+          <span class="amenidad-tag">{{ a }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- GALERÍA DE FOTOS EXTRA -->
+    {% if extra_photos %}
+    <section class="gallery-section">
+      <h3 class="gallery-title">Galería</h3>
+      <div class="photo-gallery">
+        {% for photo in extra_photos %}
+        <img src="{{ photo }}" alt="Foto de la propiedad" class="gallery-photo" />
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- DESCRIPCIÓN PROFESIONAL -->
+    <section class="content-card">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <span class="card-icon">📄</span>
+          <h2 class="card-title">Descripción profesional</h2>
+        </div>
+        <button class="btn-copy" onclick="copyToClipboard('descProfesional', this)">
+          Copiar
+        </button>
+      </div>
+      <div class="card-body">
+        <p id="descProfesional" class="generated-text">{{ descripcion_profesional }}</p>
+      </div>
+    </section>
+
+    <!-- COPY DE INSTAGRAM -->
+    <section class="content-card instagram-card">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <span class="card-icon">📸</span>
+          <h2 class="card-title">Copy para Instagram</h2>
+        </div>
+        <button class="btn-copy" onclick="copyToClipboard('copyInstagram', this)">
+          Copiar
+        </button>
+      </div>
+      <div class="card-body">
+        <p id="copyInstagram" class="generated-text instagram-text">{{ copy_instagram }}</p>
+      </div>
+    </section>
+
+    <!-- DATOS DEL AGENTE -->
+    <section class="agent-footer-card">
+      <div class="agent-info">
+        <span class="agent-avatar">👤</span>
+        <div>
+          <p class="agent-name">{{ nombre_agente }}</p>
+          <p class="agent-contact">📞 {{ telefono_agente }} &nbsp;|&nbsp; ✉️ {{ email_agente }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCIONES -->
+    <div class="result-actions">
+      <a href="/" class="btn-secondary">← Generar otra propiedad</a>
+
+      <form method="POST" action="/pdf" style="display:inline">
+        <input type="hidden" name="tipo"              value="{{ tipo }}">
+        <input type="hidden" name="operacion"         value="{{ operacion }}">
+        <input type="hidden" name="direccion"         value="{{ direccion }}">
+        <input type="hidden" name="ciudad"            value="{{ ciudad }}">
+        <input type="hidden" name="provincia"         value="{{ provincia }}">
+        <input type="hidden" name="precio"            value="{{ precio }}">
+        <input type="hidden" name="recamaras"         value="{{ recamaras }}">
+        <input type="hidden" name="banos"             value="{{ banos }}">
+        <input type="hidden" name="m2_construidos"    value="{{ m2_construidos }}">
+        <input type="hidden" name="m2_terreno"        value="{{ m2_terreno }}">
+        <input type="hidden" name="estacionamientos"  value="{{ estacionamientos }}">
+        {% for a in amenidades %}
+        <input type="hidden" name="amenidades"        value="{{ a }}">
+        {% endfor %}
+        <input type="hidden" name="nombre_agente"     value="{{ nombre_agente }}">
+        <input type="hidden" name="telefono_agente"   value="{{ telefono_agente }}">
+        <input type="hidden" name="email_agente"      value="{{ email_agente }}">
+        {% if cover_photo %}
+        <input type="hidden" name="cover_photo"       value="{{ cover_photo }}">
+        {% endif %}
+        {% for photo in extra_photos %}
+        <input type="hidden" name="extra_photos"      value="{{ photo }}">
+        {% endfor %}
+        <textarea name="descripcion_profesional" style="display:none">{{ descripcion_profesional }}</textarea>
+        <button type="submit" class="btn-pdf">⬇ Descargar PDF</button>
+      </form>
+    </div>
+
+    {% endif %}
+  </main>
+
+  <footer class="site-footer">
+    <p>AgentTool &copy; 2026 — InmoAgency</p>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
