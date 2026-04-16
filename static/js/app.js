@@ -88,6 +88,16 @@ if (fotoInput && photoPreview) {
   }
 }
 
+// ===== CLEAR DEFAULT ZERO ON NUMBER INPUTS =====
+document.querySelectorAll('input[type="number"]').forEach((input) => {
+  input.addEventListener('focus', () => {
+    if (input.value === '0') input.value = '';
+  });
+  input.addEventListener('blur', () => {
+    if (input.value === '') input.value = '0';
+  });
+});
+
 // ===== FORM SUBMIT LOADING STATE =====
 const form = document.getElementById('propertyForm');
 const submitBtn = document.getElementById('submitBtn');

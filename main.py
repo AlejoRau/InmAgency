@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fpdf import FPDF
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +24,7 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -66,58 +66,38 @@ Notas del agente: {descripcion_agente}
 
 
 def generate_professional_description(property_summary: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Sos un redactor inmobiliario experto en el mercado argentino. "
-                    "Escribís descripciones profesionales, atractivas y convincentes de propiedades. "
-                    "Usás un tono formal pero cálido, en español rioplatense. "
-                    "Destacás los puntos fuertes, la ubicación y el estilo de vida que ofrece la propiedad. "
-                    "Nunca inventás datos que no te dieron. La descripción debe tener entre 150 y 200 palabras."
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"Escribí una descripción profesional para la siguiente propiedad:\n\n{property_summary}"
-                ),
-            },
-        ],
-        temperature=0.75,
-        max_tokens=400,
+    model = genai.GenerativeModel("gemma-3-27b-it")
+    prompt = (
+        "Sos un redactor inmobiliario experto en el mercado argentino. "
+        "Escribís descripciones profesionales, atractivas y convincentes de propiedades. "
+        "Usás un tono formal pero cálido, en español rioplatense. "
+        "Destacás los puntos fuertes, la ubicación y el estilo de vida que ofrece la propiedad. "
+        "Nunca inventás datos que no te dieron. La descripción debe tener entre 150 y 200 palabras.\n\n"
+        f"Escribí una descripción profesional para la siguiente propiedad:\n\n{property_summary}"
     )
-    return response.choices[0].message.content.strip()
+    response = model.generate_content(
+        prompt,
+        generation_config=genai.GenerationConfig(temperature=0.75, max_output_tokens=400),
+    )
+    return response.text.strip()
 
 
 def generate_instagram_copy(property_summary: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Sos un experto en marketing inmobiliario para redes sociales en Argentina. "
-                    "Creás copies para Instagram que generan interés y consultas. "
-                    "Usás emojis estratégicamente, lenguaje dinámico y cercano. "
-                    "El copy debe tener máximo 150 palabras más los hashtags. "
-                    "Al final incluís entre 15 y 20 hashtags relevantes para el sector inmobiliario argentino, "
-                    "populares y en español (ej: #propiedadesargentina #inmobiliaria #casaenventa #departamento #bienesraices)."
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"Creá un copy para Instagram para la siguiente propiedad:\n\n{property_summary}"
-                ),
-            },
-        ],
-        temperature=0.8,
-        max_tokens=400,
+    model = genai.GenerativeModel("gemma-3-27b-it")
+    prompt = (
+        "Sos un experto en marketing inmobiliario para redes sociales en Argentina. "
+        "Creás copies para Instagram que generan interés y consultas. "
+        "Usás emojis estratégicamente, lenguaje dinámico y cercano. "
+        "El copy debe tener máximo 150 palabras más los hashtags. "
+        "Al final incluís entre 15 y 20 hashtags relevantes para el sector inmobiliario argentino, "
+        "populares y en español (ej: #propiedadesargentina #inmobiliaria #casaenventa #departamento #bienesraices).\n\n"
+        f"Creá un copy para Instagram para la siguiente propiedad:\n\n{property_summary}"
     )
-    return response.choices[0].message.content.strip()
+    response = model.generate_content(
+        prompt,
+        generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=400),
+    )
+    return response.text.strip()
 
 
 def upload_to_cloudinary(upload: UploadFile) -> str:
@@ -368,10 +348,15 @@ async def generate(
 ):
     # Upload photos to Cloudinary
     photo_urls = []
+    upload_error = None
     for foto in fotos:
         if foto.filename:
-            url = upload_to_cloudinary(foto)
-            photo_urls.append(url)
+            try:
+                url = upload_to_cloudinary(foto)
+                photo_urls.append(url)
+            except Exception as e:
+                upload_error = str(e)
+                break
 
     cover_photo = photo_urls[0] if photo_urls else None
     extra_photos = photo_urls[1:] if len(photo_urls) > 1 else []
@@ -387,7 +372,7 @@ async def generate(
     try:
         descripcion_profesional = generate_professional_description(summary)
         copy_instagram = generate_instagram_copy(summary)
-        error = None
+        error = upload_error  # surface photo upload error if any, but don't block
     except Exception as e:
         descripcion_profesional = ""
         copy_instagram = ""
